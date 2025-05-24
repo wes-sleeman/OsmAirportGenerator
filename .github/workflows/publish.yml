@@ -1,0 +1,44 @@
+name: Build
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Restore dependencies
+      run: dotnet restore -r win-x64
+    - name: Publish for Windows (x64)
+      run: dotnet publish --self-contained -r win-x64 -p:PublishSingleFile=true --no-restore
+    - name: Generate release tag
+      id: generate_tag
+      run: echo 'tag=release/${{ github.event.repository.updated_at }}' | sed 's/:/_/g' >> $GITHUB_OUTPUT
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.generate_tag.outputs.tag }}
+        release_name: Release ${{ github.event.repository.updated_at }}
+        body: |
+          This is an automated release. Please file an issue if you notice any problems.
+        draft: false
+        prerelease: false
+    - name: Upload file to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./OsmAirportGenerator/bin/Release/net9.0/win-x64/publish/OsmAirportGenerator.exe
+        asset_name: OsmAirportGenerator.exe
+        asset_content_type: application/octet-stream
