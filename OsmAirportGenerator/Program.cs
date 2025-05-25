@@ -96,6 +96,9 @@ out;", timeoutMins: 6);
 	string tempFolder = Directory.CreateTempSubdirectory().FullName;
 	string filePrefix = Path.Combine(tempFolder, airportIcao);
 
+	var cultureCache = System.Globalization.CultureInfo.CurrentCulture;
+	System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
 	// Generate the necessary files.
 	if (config.Visibility.Boundary!.Value)
 		await GenerateBoundaryAsync(filePrefix, data, config.Colours.Boundary!);
@@ -118,6 +121,7 @@ out;", timeoutMins: 6);
 	if (config.Visibility.Runway!.Value)
 		await GenerateRunwaysAsync(filePrefix, data, config.Colours.Runway!);
 
+	System.Globalization.CultureInfo.CurrentCulture = cultureCache;
 	Console.WriteLine("Done!");
 
 	// ZIP created data and move to executing directory.
