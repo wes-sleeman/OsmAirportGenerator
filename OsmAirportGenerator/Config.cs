@@ -5,19 +5,22 @@ namespace OsmAirportGenerator;
 internal record Config(
 	[property: JsonPropertyName("termsAccepted")] bool TermsAccepted,
 	[property: JsonPropertyName("colours")] Colourscheme Colours,
-	[property: JsonPropertyName("visibility")] Visibility Visibility
+	[property: JsonPropertyName("visibility")] Visibility Visibility,
+	[property: JsonPropertyName("inflation")] Inflation Inflation
 )
 {
 	public static Config Default { get; } = new(
 		false,
 		new Colourscheme(null, null, null, null, null, null, null).Normalise(),
-		new Visibility(null, null, null, null, null, null, null).Normalise()
+		new Visibility(null, null, null, null, null, null, null).Normalise(),
+		new Inflation(null, null).Normalise()
 	); 
 
 	public Config Normalise() => new(
 		TermsAccepted,
 		Colours.Normalise(),
-		Visibility.Normalise()
+		Visibility.Normalise(),
+		Inflation.Normalise()
 	);
 }
 
@@ -60,5 +63,16 @@ internal record Visibility(
 		Taxiway ?? true,
 		Helipad ?? true,
 		Runway ?? true
+	);
+}
+
+internal record Inflation(
+	[property: JsonPropertyName("taxiway")] double? Taxiway,
+	[property: JsonPropertyName("runway")] double? Runway
+)
+{
+	public Inflation Normalise() => new(
+		Taxiway ?? 0.0001,
+		Runway ?? 0.0002
 	);
 }

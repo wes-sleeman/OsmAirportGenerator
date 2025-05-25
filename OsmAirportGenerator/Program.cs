@@ -113,13 +113,13 @@ out;", timeoutMins: 6);
 		await GenerateTaxilanesAsync(filePrefix, data, config.Colours.Taxilane!);
 
 	if (config.Visibility.Taxiway!.Value)
-		await GenerateTaxiwaysAsync(airportIcao, filePrefix, data, config.Colours.Taxiway!, config.Colours.Taxiway!);
+		await GenerateTaxiwaysAsync(airportIcao, filePrefix, data, config.Colours.Taxiway!, config.Colours.Taxiway!, config.Inflation.Taxiway!.Value);
 
 	if (config.Visibility.Helipad!.Value)
 		await GenerateHelipadsAsync(filePrefix, data, config.Colours.Helipad!);
 
 	if (config.Visibility.Runway!.Value)
-		await GenerateRunwaysAsync(filePrefix, data, config.Colours.Runway!);
+		await GenerateRunwaysAsync(filePrefix, data, config.Colours.Runway!, config.Inflation.Runway!.Value);
 
 	System.Globalization.CultureInfo.CurrentCulture = cultureCache;
 	Console.WriteLine("Done!");
