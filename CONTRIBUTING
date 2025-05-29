@@ -22,11 +22,12 @@ All code lives in the `OsmAirportGenerator` directory. There are four code files
     * It takes user input.
     * It queries [Overpass](https://overpass-turbo.eu/) to get necessary data.
     * It creates a temporary folder for generator output.
-    * It determines which generators should be run and calls them.
+    * It calls the generators.
     * It collates and packages generator output files.
 * `Generators.cs` contains the actual generators.
     * A generator is a method that converts Overpass data into Aurora-readable files.
     * Generators are run sequentially and relevant outputs are concatenated in order.
+    * Generators are given a copy of the configuration and are responsible for suppressing their own output if required.
     * Generators are responsible for filtering the full Overpass data into just the information they need.
 * `Utils.cs` contains helper methods that keep the other files readable.
     * Each helper method uses [C# documentation comments](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/documentation-comments) to describe its behaviour.

@@ -13,7 +13,8 @@ if (File.Exists("config.json"))
 {
 	if (System.Text.Json.JsonSerializer.Deserialize<Config>(File.ReadAllText("config.json")) is not Config deserialisedConfig)
 	{
-		Console.Error.WriteLine("Invalid configuration file.");
+		File.Move("config.json", "config.broken.json");
+		Console.Error.WriteLine("Invalid configuration file. Moved to config.broken.json. Next time this program is run, a clean file will be generated.");
 		Environment.Exit(-1);
 		return;
 	}
@@ -100,26 +101,13 @@ out;", timeoutMins: 6);
 	System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
 	// Generate the necessary files.
-	if (config.Visibility.Boundary!.Value)
-		await GenerateBoundaryAsync(filePrefix, data, config.Colours.Boundary!);
-
-	if (config.Visibility.Apron!.Value)
-		await GenerateApronsAsync(filePrefix, data, config.Colours.Apron!);
-
-	if (config.Visibility.Building!.Value)
-		await GenerateBuildingsAsync(airportIcao, filePrefix, data, config.Colours.Building!);
-
-	if (config.Visibility.Taxilane!.Value)
-		await GenerateTaxilanesAsync(filePrefix, data, config.Colours.Taxilane!);
-
-	if (config.Visibility.Taxiway!.Value)
-		await GenerateTaxiwaysAsync(airportIcao, filePrefix, data, config.Colours.Taxiway!, config.Colours.Taxiway!, config.Inflation.Taxiway!.Value);
-
-	if (config.Visibility.Helipad!.Value)
-		await GenerateHelipadsAsync(filePrefix, data, config.Colours.Helipad!);
-
-	if (config.Visibility.Runway!.Value)
-		await GenerateRunwaysAsync(filePrefix, data, config.Colours.Runway!, config.Inflation.Runway!.Value);
+	await GenerateBoundaryAsync(filePrefix, data, config);
+	await GenerateApronsAsync(filePrefix, data, config);
+	await GenerateBuildingsAsync(airportIcao, filePrefix, data, config);
+	await GenerateTaxilanesAsync(filePrefix, data, config);
+	await GenerateTaxiwaysAsync(airportIcao, filePrefix, data, config);
+	await GenerateHelipadsAsync(filePrefix, data, config);
+	await GenerateRunwaysAsync(filePrefix, data, config);
 
 	System.Globalization.CultureInfo.CurrentCulture = cultureCache;
 	Console.WriteLine("Done!");
