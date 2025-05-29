@@ -12,12 +12,13 @@ internal static partial class GenerationUtils
 {
 	/// <summary>Converts a given <see cref="Way"/> to an Aurora-readable TFL block with a given colour and, optionally, filter.</summary>
 	/// <param name="way">The <see cref="Way"/> to render.</param>
-	/// <param name="colour">The colour which should be put (verbatim) into the sectorfile.</param>
+	/// <param name="fillColour">The colour which should be put (verbatim) into the "fill" colour section of the TFL header in the sectorfile.</param>
+	/// <param name="strokeColour">The colour which should be put (verbatim) into the "stroke" colour section of the TFL header in the sectorfile.</param>
 	/// <param name="filter">Optionally, one of	COAST, RUNWAY, GATES, PIER, TAXIWAY, APRON, BUILDING.</param>
 	/// <returns>A string containing the whole TFL block, ending with a newline.</returns>
-	private static string ToTfl(this Way way, string colour, string? filter = null)
+	private static string ToTfl(this Way way, string fillColour, string strokeColour, string? filter = null)
 	{
-		StringBuilder builder = new($"STATIC;{colour};1;{colour};0;");
+		StringBuilder builder = new($"STATIC;{fillColour};1;{strokeColour};0;");
 		builder.AppendLine(filter is null ? "" : filter);
 
 		foreach (Node node in way.Nodes)

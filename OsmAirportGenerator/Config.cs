@@ -4,15 +4,15 @@ namespace OsmAirportGenerator;
 
 internal record Config(
 	[property: JsonPropertyName("termsAccepted")] bool TermsAccepted,
-	[property: JsonPropertyName("colours")] Colourscheme Colours,
+	[property: JsonPropertyName("colours")] ColourschemeSet Colours,
 	[property: JsonPropertyName("visibility")] Visibility Visibility,
 	[property: JsonPropertyName("inflation")] Inflation Inflation
 )
 {
 	public static Config Default { get; } = new(
 		false,
-		new Colourscheme(null, null, null, null, null, null, null).Normalise(),
-		new Visibility(null, null, null, null, null, null, null).Normalise(),
+		ColourschemeSet.Default,
+		Visibility.Empty.Normalise(),
 		new Inflation(null, null).Normalise()
 	); 
 
@@ -21,6 +21,22 @@ internal record Config(
 		Colours.Normalise(),
 		Visibility.Normalise(),
 		Inflation.Normalise()
+	);
+}
+
+internal record ColourschemeSet(
+	[property: JsonPropertyName("fill")] Colourscheme Fill,
+	[property: JsonPropertyName("stroke")] Colourscheme Stroke
+)
+{
+	public static ColourschemeSet Default { get; } = new(
+		Colourscheme.Empty.Normalise(),
+		Colourscheme.Empty.Normalise()
+	);
+	
+	public ColourschemeSet Normalise() => new(
+		Fill.Normalise(),
+		Stroke.Normalise()
 	);
 }
 
@@ -34,6 +50,8 @@ internal record Colourscheme(
 	[property: JsonPropertyName("runway")] string? Runway
 )
 {
+	public static Colourscheme Empty { get; } = new(null, null, null, null, null, null, null);
+
 	public Colourscheme Normalise() => new(
 		Boundary ?? "BOUNDARY",
 		Apron ?? "APRON",
@@ -55,6 +73,8 @@ internal record Visibility(
 	[property: JsonPropertyName("runway")] bool? Runway
 )
 {
+	public static Visibility Empty { get; } = new(null, null, null, null, null, null, null);
+
 	public Visibility Normalise() => new(
 		Boundary ?? false,
 		Apron ?? true,
