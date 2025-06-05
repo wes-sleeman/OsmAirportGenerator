@@ -74,17 +74,40 @@ while (true)
 );
 out;", timeoutMins: 6);
 
-	Console.WriteLine("Done!");
-
-	// Make sure the airport actually pulled correctly.
+	// Check if it's a closed relation and try the alternate query just in case.
 	if (data.Nodes.Count is 0 && data.Ways.Count is 0)
 	{
-		// No nodes or ways. Probably not a valid airport.
-		Console.WriteLine(@"Not a known airport! You might need to add it in OSM.");
-		Console.WriteLine(@"<link to OSM edit page>");
-		Console.WriteLine(@"Don't forget! Follow OSM rules when editing OSM data.");
-		continue;
+		data = await Overpass.FromQueryAsync(@$"[out:json][timeout:300];
+(area[""icao""=""{airportIcao}""];)->.searchArea;
+(
+	nwr[""aeroway""](area.searchArea);
+	>;
+);
+out;", timeoutMins: 6);
+
+		// Make sure the airport actually pulled correctly.
+		if (data.Nodes.Count is 0 && data.Ways.Count is 0)
+		{
+			// No nodes or ways. Probably not a valid airport.
+			Console.WriteLine("ERROR!");
+			Console.WriteLine("Not a known airport! You might need to add it in OSM.");
+			Console.WriteLine("https://www.openstreetmap.org/edit");
+			Console.WriteLine("Don't forget! Follow OSM rules when editing OSM data.");
+			continue;
+		}
+		else
+		{
+			Console.WriteLine("Done!");
+			Console.WriteLine($"The boundary of {airportIcao} is defined as a relation.");
+			Console.WriteLine("Boundaries may not generate correctly and some data may be missing.");
+			Console.WriteLine("If this doesn't need to be a relation, consider editing OSM to combine the segments of the boundary.");
+			Console.WriteLine("https://www.openstreetmap.org/edit");
+			Console.WriteLine("Don't forget! Follow OSM rules when editing OSM data.");
+		}
+
 	}
+	else
+		Console.WriteLine("Done!");
 
 	if (data.Relations.Count > 0)
 		// There are relations. We'll try to generate "everything", but no guarantees.
